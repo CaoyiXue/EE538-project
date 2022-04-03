@@ -207,14 +207,14 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name)
 
   // xcy
   std::vector<std::string> results;
-  std::transform(name.begin(), name.end(), name.begin(),[](unsigned char c){return std::tolower(c);});
 
   for (auto &node : data)
   {
-    std::string tmp = node.second.name;
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(),[](unsigned char c){ return std::tolower(c);});
+    if (node.second.name.length() < name.length()) continue;
 
-    if (tmp.length() < name.length()) continue;
+    std::string tmp = node.second.name;
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(),[](char c){ return std::tolower(c);});
+    std::transform(name.begin(), name.end(), name.begin(),[](char c){return std::tolower(c);});
     if (tmp.compare(0, name.length(), name) == 0)
     {
       results.push_back(node.second.name);
