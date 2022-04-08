@@ -116,6 +116,10 @@ class TrojanMap {
 
   // Get the subgraph based on the input
   std::vector<std::string> GetSubgraph(std::vector<double> &square);
+
+  //xcy // Cycle Detection Helper
+  bool CycleHelper(std::string current_id, std::map<std::string, int> &marks, 
+  std::string parent_id, std::vector<double> &square);
   
   // Given a subgraph specified by a square-shape area, determine whether there is a
   // cycle or not in this subgraph.

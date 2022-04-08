@@ -558,7 +558,7 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
 }
 
 /**
- * inSquare: Give a id retunr whether it is in square or not.
+ * inSquare: Give a id return whether it is in square or not.
  *
  * @param  {std::string} id            : location id
  * @param  {std::vector<double>} square: four vertexes of the square area
@@ -566,6 +566,13 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
  */
 bool TrojanMap::inSquare(std::string id, std::vector<double> &square)
 {
+  //xcy
+  const Node& node = data[id];
+  if (node.lon>=square[0] && node.lon<=square[1] 
+      && node.lat <= square[2] && node.lat >= square[3])
+  {
+    return true;
+  }
   return false;
 }
 
@@ -579,7 +586,40 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square)
 {
   // include all the nodes in subgraph
   std::vector<std::string> subgraph;
+  //xcy
+  for(const auto& node : data){
+    if (inSquare(node.first, square))
+    {
+      subgraph.push_back(node.first);
+    }
+  }
   return subgraph;
+}
+
+/** //xcy
+ * Cycle Detection Helper
+ */
+bool TrojanMap::CycleHelper(std::string current_id, std::map<std::string, int> &marks, 
+std::string parent_id, std::vector<double> &square)
+{
+  marks[current_id] = 1;
+  for(const auto& child_id : data[current_id].neighbors){
+    if (inSquare(child_id, square))
+    {
+      if (marks[child_id]==1 && child_id != parent_id)
+      {
+        return true;
+      }
+      if (marks[child_id] != 1)
+      {
+        if (CycleHelper(child_id, marks, current_id, square))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /**
@@ -592,6 +632,17 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square)
  */
 bool TrojanMap::CycleDetection(std::vector<std::string> &subgraph, std::vector<double> &square)
 {
+  //xcy
+  std::map<std::string, int> marks;
+  for(const auto& node : subgraph){
+    if (marks[node] != 1)
+    {
+      if (CycleHelper(node, marks, "", square))
+      {
+        return true;
+      }
+    }
+  }
   return false;
 }
 
