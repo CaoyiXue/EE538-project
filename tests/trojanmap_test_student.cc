@@ -1,7 +1,11 @@
+#include <filesystem>
+#include <unistd.h>
 #include "gtest/gtest.h"
+#include "gtest/internal/gtest-filepath.h"
 #include "src/lib/trojanmap.h"
 
-TEST(GetLat, GetLatTest1) {
+TEST(GetLat, GetLatTest1)
+{
   TrojanMap tm;
   std::string id = "653740";
   double expected = tm.GetLat(id);
@@ -11,7 +15,8 @@ TEST(GetLat, GetLatTest1) {
   EXPECT_EQ(tm.GetLat(wrong_lat), -1);
 }
 
-TEST(GetLon, GetLonTest1) {
+TEST(GetLon, GetLonTest1)
+{
   TrojanMap tm;
   std::string id = "653740";
   double expected = tm.GetLon(id);
@@ -20,8 +25,9 @@ TEST(GetLon, GetLonTest1) {
   std::string wrong_lon = "-1";
   EXPECT_EQ(tm.GetLon(wrong_lon), -1);
 }
-//358784231,34.0189016,-118.3070196,Foshay Learning Center,{'school'},{'7432340645'}
-TEST(GetName, GetNameTest1) {
+// 358784231,34.0189016,-118.3070196,Foshay Learning Center,{'school'},{'7432340645'}
+TEST(GetName, GetNameTest1)
+{
   TrojanMap tm;
   std::string id = "358784231";
   std::string expected = tm.GetName(id);
@@ -30,7 +36,8 @@ TEST(GetName, GetNameTest1) {
   std::string wrong_id = "-1";
   EXPECT_EQ(tm.GetName(wrong_id), "NULL");
 }
-TEST(GetNeighborIDs, GetNeighborIDsTest1) {
+TEST(GetNeighborIDs, GetNeighborIDsTest1)
+{
   TrojanMap tm;
   std::string id = "358784231";
   std::vector<std::string> expected = tm.GetNeighborIDs(id);
@@ -41,7 +48,8 @@ TEST(GetNeighborIDs, GetNeighborIDsTest1) {
   EXPECT_EQ(tm.GetNeighborIDs(wrong_id), actual2);
 }
 
-TEST(GetID, GetIDTest1) {
+TEST(GetID, GetIDTest1)
+{
   TrojanMap tm;
   std::string name = "Foshay Learning Center";
   std::string expected = tm.GetID(name);
@@ -51,15 +59,18 @@ TEST(GetID, GetIDTest1) {
   EXPECT_EQ(tm.GetID(wrong_name), "");
 }
 
-TEST(TrojanMapTest, Autocomplete) {
+TEST(TrojanMapTest, Autocomplete)
+{
   TrojanMap m;
   // Test the simple case
   auto names = m.Autocomplete("Chi");
   std::unordered_set<std::string> gt = {"Chick-fil-A", "Chipotle", "Chinese Street Food"}; // groundtruth for "Ch"
   int success = 0;
-  for (auto& n: names) {
+  for (auto &n : names)
+  {
     EXPECT_EQ(gt.count(n) > 0, true) << n + " is not in gt.";
-    if (gt.count(n) > 0){
+    if (gt.count(n) > 0)
+    {
       success++;
     }
   }
@@ -67,29 +78,35 @@ TEST(TrojanMapTest, Autocomplete) {
   // Test the lower case
   names = m.Autocomplete("chi");
   success = 0;
-  for (auto& n: names) {
+  for (auto &n : names)
+  {
     EXPECT_EQ(gt.count(n) > 0, true) << n + " is not in gt.";
-    if (gt.count(n) > 0){
+    if (gt.count(n) > 0)
+    {
       success++;
     }
   }
   EXPECT_EQ(success, gt.size());
-  // Test the lower and upper case 
-  names = m.Autocomplete("cHi"); 
+  // Test the lower and upper case
+  names = m.Autocomplete("cHi");
   success = 0;
-  for (auto& n: names) {
+  for (auto &n : names)
+  {
     EXPECT_EQ(gt.count(n) > 0, true) << n + " is not in gt.";
-    if (gt.count(n) > 0){
+    if (gt.count(n) > 0)
+    {
       success++;
     }
   }
   EXPECT_EQ(success, gt.size());
-  // Test the upper case 
-  names = m.Autocomplete("CHI"); 
+  // Test the upper case
+  names = m.Autocomplete("CHI");
   success = 0;
-  for (auto& n: names) {
+  for (auto &n : names)
+  {
     EXPECT_EQ(gt.count(n) > 0, true) << n + " is not in gt.";
-    if (gt.count(n) > 0){
+    if (gt.count(n) > 0)
+    {
       success++;
     }
   }
@@ -97,9 +114,10 @@ TEST(TrojanMapTest, Autocomplete) {
 }
 
 // Test FindPosition function
-TEST(TrojanMapTest, FindPosition) {
+TEST(TrojanMapTest, FindPosition)
+{
   TrojanMap m;
-  
+
   // Test Chick-fil-A
   auto position = m.GetPosition("Chick-fil-A");
   std::pair<double, double> gt1(34.0167334, -118.2825307); // groundtruth for "Chick-fil-A"
@@ -119,23 +137,95 @@ TEST(TrojanMapTest, FindPosition) {
 }
 
 // Test CalculateEditDistance function
-TEST(TrojanMapTest, CalculateEditDistance) {
+TEST(TrojanMapTest, CalculateEditDistance)
+{
   TrojanMap m;
   EXPECT_EQ(m.CalculateEditDistance("horse", "ros"), 3);
   EXPECT_EQ(m.CalculateEditDistance("intention", "execution"), 5);
 }
 
 // Test FindClosestName function
-TEST(TrojanMapTest, FindClosestName) {
+TEST(TrojanMapTest, FindClosestName)
+{
   TrojanMap m;
   EXPECT_EQ(m.FindClosestName("Rolphs"), "Ralphs");
   EXPECT_EQ(m.FindClosestName("Targeety"), "Target");
 }
 
-// Test cycle detection function
-TEST(TrojanMapTest, CycleDetection) {
+TEST(ReadLocationsFromCSVFile, ReadLocationsFromCSVFileTest1)
+{
   TrojanMap m;
-  
+  // need manually modify file path
+  std::string file_path = "/Users/caoyi/EE538/EE538-project/input/topologicalsort_locations.csv";
+  std::vector<std::string> expected{"Ralphs", "KFC", "Chick-fil-A"};
+  EXPECT_EQ(m.ReadLocationsFromCSVFile(file_path), expected);
+}
+TEST(ReadLocationsFromCSVFile, ReadLocationsFromCSVFileTest2)
+{
+  TrojanMap m;
+  // need manually modify file path
+  std::string file_path = "/Users/caoyi/EE538/EE538-project/input/test1_l.csv";
+  std::vector<std::string> expected{"Ralphs", "KFC", "Chick-fil-A", "Kaitlyn", "FaceHaus"};
+  EXPECT_EQ(m.ReadLocationsFromCSVFile(file_path), expected);
+}
+
+TEST(ReadDependenciesFromCSVFile, ReadDependenciesFromCSVFileTest1)
+{
+  TrojanMap m;
+  // testing::internal::FilePath path = testing::internal::FilePath::GetCurrentDir();
+  // need manually modify file path
+  std::string file_path = "/Users/caoyi/EE538/EE538-project/input/topologicalsort_dependencies.csv";
+  std::vector<std::vector<std::string>> expected{{"Ralphs", "Chick-fil-A"}, {"Ralphs", "KFC"}, {"Chick-fil-A", "KFC"}};
+  EXPECT_EQ(m.ReadDependenciesFromCSVFile(file_path), expected);
+}
+TEST(ReadDependenciesFromCSVFile, ReadDependenciesFromCSVFileTest2)
+{
+  TrojanMap m;
+  // testing::internal::FilePath path = testing::internal::FilePath::GetCurrentDir();
+  // need manually modify file path
+  std::string file_path = "/Users/caoyi/EE538/EE538-project/input/test1_d.csv";
+  std::vector<std::vector<std::string>> expected{{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Kaitlyn", "Chick-fil-A"}, {"Kaitlyn", "FaceHaus"}};
+  EXPECT_EQ(m.ReadDependenciesFromCSVFile(file_path), expected);
+}
+
+// Test cycle detection function
+TEST(TrojanMapTest, TopologicalSort)
+{
+  TrojanMap m;
+
+  std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC"};
+  std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"KFC", "Chick-fil-A"}};
+  auto result = m.DeliveringTrojan(location_names, dependencies);
+  std::vector<std::string> gt = {"Ralphs", "KFC", "Chick-fil-A"};
+  EXPECT_EQ(result, gt);
+}
+TEST(TrojanMapTest, TopologicalSortTest2)
+{
+  TrojanMap m;
+
+  std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC"};
+  std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Chick-fil-A", "KFC"}};
+  auto result = m.DeliveringTrojan(location_names, dependencies);
+  std::vector<std::string> gt = {"Ralphs", "Chick-fil-A", "KFC"};
+  EXPECT_EQ(result, gt);
+}
+TEST(TrojanMapTest, TopologicalSortTest3)
+{
+  TrojanMap m;
+
+  std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC", "Kaitlyn", "FaceHaus"};
+  std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Kaitlyn", "Chick-fil-A"}, {"Kaitlyn", "FaceHaus"}};
+  auto result = m.DeliveringTrojan(location_names, dependencies);
+  std::vector<std::string> gt = { "Kaitlyn", "FaceHaus", "Ralphs", "Chick-fil-A", "KFC" };
+  EXPECT_EQ(result, gt);
+  EXPECT_EQ(m.data["5617977548"].name, "");
+}
+
+// Test cycle detection function
+TEST(TrojanMapTest, CycleDetection)
+{
+  TrojanMap m;
+
   // Test case 1
   std::vector<double> square1 = {-118.299, -118.264, 34.032, 34.011};
   auto sub1 = m.GetSubgraph(square1);
