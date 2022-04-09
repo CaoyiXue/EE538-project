@@ -145,14 +145,18 @@ public:
     // xcy
     //  Delivering Trojan Helper
     void DeliverHelper(std::string loc_name,
-                       std::unordered_map<std::string, std::vector<std::string>> &edge_map,
                        std::map<std::string, int> &marks, std::vector<std::string> &topo);
 
     // xcy
     //  Check circle exisitence for delivering Trojan function
-    bool IsCycle_helper(std::string loc_name, std::map<std::string, int> &visited,
-                        std::unordered_map<std::string, std::vector<std::string>> &edge_map);
-    bool IsCycle(std::unordered_map<std::string, std::vector<std::string>> &edge_map);
+    bool IsCycleDeliver_helper(std::string loc_name, std::map<std::string, int> &visited);
+    bool IsCycleDeliver();
+
+    //----------------------------------------------------- User-defined variables
+    //xcy
+    // adjacency list for delivering Trojan function
+    std::unordered_map<std::string, std::vector<std::string>> AdjListDeliver;
+    
 };
 
 #endif

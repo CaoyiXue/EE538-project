@@ -586,11 +586,10 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(std
 /**
  * Check whether a circle existed in directed graph for delivering Trojan function
  */
-bool TrojanMap::IsCycle_helper(std::string loc_name, std::map<std::string, int> &visited,
-                               std::unordered_map<std::string, std::vector<std::string>> &edge_map)
+bool TrojanMap::IsCycleDeliver_helper(std::string loc_name, std::map<std::string, int> &visited)
 {
   visited[loc_name] = 1;
-  for (auto &child : edge_map[loc_name])
+  for (auto &child : AdjListDeliver[loc_name])
   {
     if (visited[child] == 1)
     {
@@ -598,7 +597,7 @@ bool TrojanMap::IsCycle_helper(std::string loc_name, std::map<std::string, int> 
     }
     else if (visited[child] != 2)
     {
-      if (IsCycle_helper(child, visited, edge_map))
+      if (IsCycleDeliver_helper(child, visited))
       {
         return true;
       }
@@ -607,15 +606,15 @@ bool TrojanMap::IsCycle_helper(std::string loc_name, std::map<std::string, int> 
   visited[loc_name] = 2;
   return false;
 }
-bool TrojanMap::IsCycle(std::unordered_map<std::string, std::vector<std::string>> &edge_map)
+bool TrojanMap::IsCycleDeliver()
 {
   std::map<std::string, int> visited;
 
-  for (auto &node : edge_map)
+  for (auto &node : AdjListDeliver)
   {
     if (visited[node.first] != 1 && visited[node.first] != 2)
     {
-      if (IsCycle_helper(node.first, visited, edge_map))
+      if (IsCycleDeliver_helper(node.first, visited))
       {
         return true;
       }
@@ -628,15 +627,14 @@ bool TrojanMap::IsCycle(std::unordered_map<std::string, std::vector<std::string>
  * Delivering Trojan Helper
  */
 void TrojanMap::DeliverHelper(std::string loc_name,
-                              std::unordered_map<std::string, std::vector<std::string>> &edge_map,
                               std::map<std::string, int> &marks, std::vector<std::string> &topo)
 {
   marks[loc_name] = 1;
-  for (auto &child : edge_map[loc_name])
+  for (auto &child : AdjListDeliver[loc_name])
   {
     if (marks[child] != 1)
     {
-      DeliverHelper(child, edge_map, marks, topo);
+      DeliverHelper(child, marks, topo);
     }
   }
   topo.push_back(loc_name);
@@ -655,20 +653,19 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
 {
   std::vector<std::string> result;
   // xcy
-  std::unordered_map<std::string, std::vector<std::string>> edge_map;
   std::map<std::string, int> marks;
 
   for (auto &loc : locations)
   {
     std::vector<std::string> tmp;
-    edge_map[loc] = tmp;
+    AdjListDeliver[loc] = tmp;
   }
   for (auto &dep : dependencies)
   {
-    edge_map[dep[0]].push_back(dep[1]);
+    AdjListDeliver[dep[0]].push_back(dep[1]);
   }
   // If has cycle in this map, return empty vector
-  if (IsCycle(edge_map))
+  if (IsCycleDeliver())
   {
     return result;
   }
@@ -677,7 +674,7 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
   {
     if (marks[loc] != 1)
     {
-      DeliverHelper(loc, edge_map, marks, result);
+      DeliverHelper(loc, marks, result);
     }
   }
 
