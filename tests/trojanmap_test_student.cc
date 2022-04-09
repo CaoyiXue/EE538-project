@@ -165,7 +165,7 @@ TEST(ReadLocationsFromCSVFile, ReadLocationsFromCSVFileTest2)
   TrojanMap m;
   // need manually modify file path
   std::string file_path = "/Users/caoyi/EE538/EE538-project/input/test1_l.csv";
-  std::vector<std::string> expected{"Ralphs", "KFC", "Chick-fil-A", "Kaitlyn", "FaceHaus"};
+  std::vector<std::string> expected{ "Ralphs", "KFC", "Chick-fil-A", "Kaitlyn", "Adams Normandie Historic District" };
   EXPECT_EQ(m.ReadLocationsFromCSVFile(file_path), expected);
 }
 
@@ -184,7 +184,7 @@ TEST(ReadDependenciesFromCSVFile, ReadDependenciesFromCSVFileTest2)
   // testing::internal::FilePath path = testing::internal::FilePath::GetCurrentDir();
   // need manually modify file path
   std::string file_path = "/Users/caoyi/EE538/EE538-project/input/test1_d.csv";
-  std::vector<std::vector<std::string>> expected{{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Kaitlyn", "Chick-fil-A"}, {"Kaitlyn", "FaceHaus"}};
+  std::vector<std::vector<std::string>> expected{{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Kaitlyn", "Chick-fil-A"}, {"Kaitlyn", "Adams Normandie Historic District"}};
   EXPECT_EQ(m.ReadDependenciesFromCSVFile(file_path), expected);
 }
 
@@ -216,9 +216,28 @@ TEST(TrojanMapTest, TopologicalSortTest3)
   std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC", "Kaitlyn", "FaceHaus"};
   std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"Ralphs", "Chick-fil-A"}, {"Kaitlyn", "Chick-fil-A"}, {"Kaitlyn", "FaceHaus"}};
   auto result = m.DeliveringTrojan(location_names, dependencies);
-  std::vector<std::string> gt = { "Kaitlyn", "FaceHaus", "Ralphs", "Chick-fil-A", "KFC" };
+  std::vector<std::string> gt = {"Kaitlyn", "FaceHaus", "Ralphs", "Chick-fil-A", "KFC"};
   EXPECT_EQ(result, gt);
-  EXPECT_EQ(m.data["5617977548"].name, "");
+}
+TEST(TrojanMapTest, TopologicalSortTest4)
+{
+  TrojanMap m;
+
+  std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC"};
+  std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"KFC", "Chick-fil-A"}, {"Chick-fil-A", "Ralphs"}};
+  auto result = m.DeliveringTrojan(location_names, dependencies);
+  std::vector<std::string> gt;
+  EXPECT_EQ(result, gt);
+}
+TEST(TrojanMapTest, TopologicalSortTest5)
+{
+  TrojanMap m;
+
+  std::vector<std::string> location_names = {"Ralphs", "Chick-fil-A", "KFC"};
+  std::vector<std::vector<std::string>> dependencies = {{"Ralphs", "KFC"}, {"KFC", "Ralphs"}, {"Ralphs","Chick-fil-A"}};
+  auto result = m.DeliveringTrojan(location_names, dependencies);
+  std::vector<std::string> gt;
+  EXPECT_EQ(result, gt);
 }
 
 // Test cycle detection function

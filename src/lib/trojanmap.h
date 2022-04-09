@@ -15,8 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <climits>
-#include <filesystem>
-#include <unistd.h>
+
 
 // A Node is the location of one point in the map.
 class Node
@@ -148,6 +147,12 @@ public:
     void DeliverHelper(std::string loc_name,
                        std::unordered_map<std::string, std::vector<std::string>> &edge_map,
                        std::map<std::string, int> &marks, std::vector<std::string> &topo);
+
+    // xcy
+    //  Check circle exisitence for delivering Trojan function
+    bool IsCycle_helper(std::string loc_name, std::map<std::string, int> &visited,
+                        std::unordered_map<std::string, std::vector<std::string>> &edge_map);
+    bool IsCycle(std::unordered_map<std::string, std::vector<std::string>> &edge_map);
 };
 
 #endif

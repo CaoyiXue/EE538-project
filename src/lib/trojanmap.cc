@@ -574,7 +574,7 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(std
     {
       dep.push_back(word);
     }
-    if (dep.size()==2)
+    if (dep.size() == 2)
     {
       dependencies_from_csv.push_back(dep);
     }
@@ -582,6 +582,47 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(std
   return dependencies_from_csv;
 }
 
+// xcy
+/**
+ * Check whether a circle existed in directed graph for delivering Trojan function
+ */
+bool TrojanMap::IsCycle_helper(std::string loc_name, std::map<std::string, int> &visited,
+                               std::unordered_map<std::string, std::vector<std::string>> &edge_map)
+{
+  visited[loc_name] = 1;
+  for (auto &child : edge_map[loc_name])
+  {
+    if (visited[child] == 1)
+    {
+      return true;
+    }
+    else if (visited[child] != 2)
+    {
+      if (IsCycle_helper(child, visited, edge_map))
+      {
+        return true;
+      }
+    }
+  }
+  visited[loc_name] = 2;
+  return false;
+}
+bool TrojanMap::IsCycle(std::unordered_map<std::string, std::vector<std::string>> &edge_map)
+{
+  std::map<std::string, int> visited;
+
+  for (auto &node : edge_map)
+  {
+    if (visited[node.first] != 1 && visited[node.first] != 2)
+    {
+      if (IsCycle_helper(node.first, visited, edge_map))
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 // xcy
 /**
  * Delivering Trojan Helper
@@ -625,6 +666,11 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
   for (auto &dep : dependencies)
   {
     edge_map[dep[0]].push_back(dep[1]);
+  }
+  // If has cycle in this map, return empty vector
+  if (IsCycle(edge_map))
+  {
+    return result;
   }
 
   for (auto &loc : locations)
@@ -677,6 +723,7 @@ std::vector<std::string> TrojanMap::GetSubgraph(std::vector<double> &square)
   }
   return subgraph;
 }
+
 // xcy
 /**
  * Cycle Detection Helper
