@@ -14,6 +14,7 @@
 #include <math.h>
 #include <fstream>
 #include <sstream>
+#include <limits>
 #include <climits>
 
 
@@ -151,6 +152,10 @@ public:
     //  Check circle exisitence for delivering Trojan function
     bool IsCycleDeliver_helper(std::string loc_name, std::map<std::string, int> &visited);
     bool IsCycleDeliver();
+
+    //xcy
+    // map of node to its predecessors function for BellmanFord shortest path
+    std::map<std::string, std::vector<std::string>> GetPredecessors();
 
     //----------------------------------------------------- User-defined variables
     //xcy

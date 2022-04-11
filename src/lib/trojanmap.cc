@@ -355,6 +355,69 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
   x = path[desindex];
   return x;
   */
+  // xcy
+  std::vector<std::string> res;
+  std::string source = GetID(location1_name);
+  std::string target = GetID(location2_name);
+  std::priority_queue<std::pair<double, std::string>,
+                      std::vector<std::pair<double, std::string>>,
+                      std::greater<std::pair<double, std::string>>>
+      q;
+  double infinite = std::numeric_limits<double>::max();
+  std::map<std::string, double> distances;
+  std::map<std::string, int> marks;
+  std::map<std::string, std::string> pre;
+  for (auto &node : data)
+  {
+    distances[node.first] = infinite;
+  }
+  distances[source] = 0.0;
+  q.push(std::make_pair(0.0, source));
+
+  while (!q.empty())
+  {
+    std::string u = q.top().second;
+    q.pop();
+    while (marks[u] == 2)
+    {
+      u = q.top().second;
+      q.pop();
+    }
+    marks[u] = 1;
+
+    if (u == target)
+    {
+      break;
+    }
+
+    for (auto &child : data[u].neighbors)
+    {
+      if (marks[child] != 1 && marks[child] != 2)
+      {
+        double alt = distances[u] + CalculateDistance(u, child);
+        if (distances[child] > alt)
+        {
+          distances[child] = alt;
+          q.push(std::make_pair(alt, child));
+          pre[child] = u;
+        }
+      }
+    }
+    marks[u] = 2;
+  }
+
+  if (marks[target] == 1)
+  {
+    res.push_back(target);
+    while (target != source)
+    {
+      target = pre[target];
+      res.push_back(target);
+    }
+    std::reverse(res.begin(), res.end());
+  }
+
+  return res;
 }
 // xyx
 //  int fac(int i)
@@ -368,6 +431,22 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
 //  }
 
 /**
+ * Map of node to its predecessors function for BellmanFord shortest path
+ */
+std::map<std::string, std::vector<std::string>> TrojanMap::GetPredecessors()
+{
+  std::map<std::string, std::vector<std::string>> pres;
+  for (auto &node : data)
+  {
+    for (auto &child : node.second.neighbors)
+    {
+      pres[child].push_back(node.first);
+    }
+  }
+  return pres;
+}
+
+/**
  * CalculateShortestPath_Bellman_Ford: Given 2 locations, return the shortest path which is a
  * list of id. Hint: Do the early termination when there is no change on distance.
  *
@@ -379,6 +458,58 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
     std::string location1_name, std::string location2_name)
 {
   std::vector<std::string> path;
+  // xcy
+  std::map<std::string, double> distance;
+  std::string source = GetID(location1_name);
+  std::string target = GetID(location2_name);
+  std::map<std::string, std::string> pre_path;
+  bool break_flag = false;
+
+  double infinite = std::numeric_limits<double>::max();
+  std::map<std::string, std::vector<std::string>> predecessor = GetPredecessors();
+  for (auto &node : predecessor)
+  {
+    distance[node.first] = infinite;
+  }
+  distance[source] = 0.0;
+  for (int i = 0; i < predecessor.size() - 1; i++)
+  { 
+    double tmp = distance[target];
+    for (auto &node : predecessor)
+    {
+      for (auto &p : node.second)
+      {
+        if (distance[p] < infinite)
+        {
+          double asl = distance[p] + CalculateDistance(p, node.first);
+          if (asl < distance[node.first])
+          {
+            distance[node.first] = asl;
+            pre_path[node.first] = p;
+          }
+        }
+      }
+      if (tmp != infinite && node.first == target && tmp == distance[target])
+      {
+        break_flag = true;
+        break; 
+      }
+    }
+    if (break_flag)
+    {
+      break;
+    }
+  }
+  if (distance[target] != infinite)
+  {
+    path.push_back(target);
+    while (target != source)
+    {
+      target = pre_path[target];
+      path.push_back(target);
+    }
+    std::reverse(path.begin(), path.end());
+  }
   return path;
 }
 
