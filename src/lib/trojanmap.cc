@@ -472,7 +472,6 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
     return path;
   }
   std::map<std::string, std::string> pre_path;
-  bool break_flag = false;
 
   double infinite = std::numeric_limits<double>::max();
   std::map<std::string, std::vector<std::string>> predecessor = GetPredecessors();
