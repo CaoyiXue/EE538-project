@@ -222,9 +222,9 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name)
       continue;
 
     std::string tmp = node.second.name;
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), [](char c)
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(), [](unsigned char c)
                    { return std::tolower(c); });
-    std::transform(name.begin(), name.end(), name.begin(), [](char c)
+    std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c)
                    { return std::tolower(c); });
     if (tmp.compare(0, name.length(), name) == 0)
     {
@@ -359,6 +359,11 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
   std::vector<std::string> res;
   std::string source = GetID(location1_name);
   std::string target = GetID(location2_name);
+  if (location1_name.empty() || location2_name.empty())
+  {
+    return res;
+  }
+  
   std::priority_queue<std::pair<double, std::string>,
                       std::vector<std::pair<double, std::string>>,
                       std::greater<std::pair<double, std::string>>>
@@ -462,22 +467,27 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
   std::map<std::string, double> distance;
   std::string source = GetID(location1_name);
   std::string target = GetID(location2_name);
+  if (location1_name.empty() || location2_name.empty())
+  {
+    return path;
+  }
   std::map<std::string, std::string> pre_path;
   bool break_flag = false;
 
   double infinite = std::numeric_limits<double>::max();
   std::map<std::string, std::vector<std::string>> predecessor = GetPredecessors();
+  int count = 0;
   for (auto &node : predecessor)
   {
     distance[node.first] = infinite;
   }
   distance[source] = 0.0;
   for (int i = 0; i < predecessor.size() - 1; i++)
-  { 
+  {
     double tmp = distance[target];
     for (auto &node : predecessor)
     {
-      for (auto &p : node.second)
+      for (auto& p : node.second)
       {
         if (distance[p] < infinite)
         {
@@ -491,11 +501,10 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(
       }
       if (tmp != infinite && node.first == target && tmp == distance[target])
       {
-        break_flag = true;
-        break; 
+        count++;
       }
     }
-    if (break_flag)
+    if (count > 5)
     {
       break;
     }
