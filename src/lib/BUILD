@@ -15,7 +15,7 @@ cc_library(
     deps = ["@opencv//:opencv", "//src/lib:TrojanMap", "//src/lib:UI", "@ncurses//:main"],
     data = ["data.csv", 
     "map.png", 
-    "output0.avi","output0_2opt.avi","output0_backtracking.avi"],
+    "output0.avi","output0_2opt.avi","output0_backtracking.avi","output0_3opt.avi"],
     visibility = ["//visibility:public"],
 )
 

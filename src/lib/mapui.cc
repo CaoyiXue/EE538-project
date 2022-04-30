@@ -237,6 +237,28 @@ void MapUI::PrintMenu() {
     std::cout << menu;
     std::cout << "Time taken by function: " << duration.count()/1000 << " ms" << std::endl << std::endl;
 
+    std::cout << "Calculating ..." << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+    results = map.TravellingTrojan_3opt(locations);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    CreateAnimation(results.second, "output0_3opt.avi");
+    menu = "*************************Results******************************\n";
+    std::cout << menu;
+    menu = "TravellingTrojan_3opt\n";
+    std::cout << menu;
+    if (results.second.size() != 0) {
+      for (auto x : results.second[results.second.size()-1]) std::cout << "\"" << x << "\",";
+      std::cout << "\nThe distance of the path is:" << results.first << " miles" << std::endl;
+      PlotPath(results.second[results.second.size()-1]);
+    } else {
+      std::cout << "The size of the path is 0" << std::endl;
+    }
+    menu = "**************************************************************\n"
+           "You could find your animation at src/lib/output0_3opt.avi.     \n";
+    std::cout << menu;
+    std::cout << "Time taken by function: " << duration.count()/1000 << " ms" << std::endl << std::endl;
+
     PrintMenu();
     break;
   }
@@ -265,15 +287,21 @@ void MapUI::PrintMenu() {
     square.push_back(atof(input.c_str()));
     auto subgraph = map.GetSubgraph(square);
     PlotPointsandEdges(subgraph, square);
-    
+
     auto start = std::chrono::high_resolution_clock::now();
     auto results = map.CycleDetection(subgraph, square);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     menu = "*************************Results******************************\n";
     std::cout << menu;
-    if (results == true)
+    if (results)
+    {
       std::cout << "there exists a cycle in the subgraph " << std::endl;
+      PlotPath(map.CyclePath);
+      for(auto& p : map.CyclePath){
+        std::cout << p << std::endl;
+      }
+    }
     else
       std::cout << "there exist no cycle in the subgraph " << std::endl;
     menu = "**************************************************************\n";

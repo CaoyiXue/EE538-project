@@ -92,7 +92,9 @@
     "*.tcc": "cpp",
     "memory_resource": "cpp",
     "stop_token": "cpp",
-    "cfloat": "cpp"
+    "cfloat": "cpp",
+    "__functional_03": "cpp",
+    "variant": "cpp"
   },
   "lldb.displayFormat": "auto",
   "lldb.dereferencePointers": true,

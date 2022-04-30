@@ -14,10 +14,7 @@
 #include <math.h>
 #include <fstream>
 #include <sstream>
-#include <limits>
 #include <climits>
-
-
 // A Node is the location of one point in the map.
 class Node
 {
@@ -123,6 +120,9 @@ public:
     std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan_2opt(
         std::vector<std::string> location_ids);
 
+    std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan_3opt(
+        std::vector<std::string> location_ids);
+
     // Check whether the id is in square or not
     bool inSquare(std::string id, std::vector<double> &square);
 
@@ -138,30 +138,47 @@ public:
 
     //----------------------------------------------------- User-defined functions
 
-    // xcy
+    int EDHelper(std::string& a, std::string& b, int m, int n);
+    int CalculateEditDistance_noDP(std::string a, std::string b);
+    std::string FindClosestName_noDP(std::string name);
+
     // Cycle Detection Helper
     bool CycleHelper(std::string current_id, std::map<std::string, int> &marks,
-                     std::string parent_id, std::vector<double> &square);
+                     std::string parent_id, std::vector<double> &square,
+                     std::map<std::string, std::string> &pre,
+                     std::string &end, std::string &start);
 
-    // xcy
     //  Delivering Trojan Helper
     void DeliverHelper(std::string loc_name,
                        std::map<std::string, int> &marks, std::vector<std::string> &topo);
 
-    // xcy
     //  Check circle exisitence for delivering Trojan function
     bool IsCycleDeliver_helper(std::string loc_name, std::map<std::string, int> &visited);
     bool IsCycleDeliver();
 
-    //xcy
-    // map of node to its predecessors function for BellmanFord shortest path
+    // Map of node to its predecessors function for BellmanFord shortest path
     std::map<std::string, std::vector<std::string>> GetPredecessors();
 
+    // Travelling salesman Brute Force Helper
+    void TravellingTrojan_helper(
+        int cur_node, double cur_cost, std::vector<std::string> &cur_path,
+        std::pair<double, std::vector<std::vector<std::string>>> &records,
+        std::vector<std::string> &location_ids, bool &isBacktracking);
+
+    // TwoOptSwap for TravellingTrojan_2opt
+    std::vector<std::string> TwoOptSwap(int i, int k, std::vector<std::string> location_ids);
+
+    // all segments for 3opt
+    std::vector<std::vector<int>> all_segments(int N);
+    std::vector<std::string> ThreeOptSwap(std::vector<int> segment, std::vector<std::string>& ids);
+    std::vector<std::string> correct_order(std::vector<std::string> ids, std::string source);
     //----------------------------------------------------- User-defined variables
-    //xcy
+
     // adjacency list for delivering Trojan function
     std::unordered_map<std::string, std::vector<std::string>> AdjListDeliver;
-    
+
+    // record path of cycle for Cycle detection
+    std::vector<std::string> CyclePath;
 };
 
 #endif
