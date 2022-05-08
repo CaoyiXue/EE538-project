@@ -297,7 +297,7 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(
   {
     std::string u = q.top().second;
     q.pop();
-    while (marks[u] == 2)
+    while (marks[u] == 2 && !q.empty())
     {
       u = q.top().second;
       q.pop();
